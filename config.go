@@ -3,13 +3,15 @@ package main
 // Config is a top level configuration object - it takes care of the global properties
 // of the populator.
 type Config struct {
-	BaseUrl      string       `json:"esBaseUrl"`
-	DictFile     string       `json:"dictFile"`
-	QueueSize    int          `json:"queueSize"`
-	Workers      int          `json:"workers"`
-	TemplateBase string       `json:"jsonTemplates"`
-	DateFormat   string       `json:"dateFormat"`
-	Entities     []ConfEntity `json:"entities"`
+	BaseUrl           string       `json:"esBaseUrl"`
+	DictFile          string       `json:"dictFile"`
+	QueueSize         int          `json:"queueSize"`
+	Workers           int          `json:"workers"`
+	TemplateBase      string       `json:"jsonTemplates"`
+	DateFormat        string       `json:"dateFormat"`
+	UnsafeIndexDelete bool         `json:"unsafeIndexDelete"`
+	QuietMode         bool         `json:"quietMode"`
+	Entities          []ConfEntity `json:"entities"`
 }
 
 // ConfEntity is an entity-specific configuration.  Each type of entity to be populated should have

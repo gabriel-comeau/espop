@@ -23,6 +23,18 @@ Nothing outside of the go stdlib.
 
 A working elasticsearch instance (tested against **5.2** and **5.3** versions)
 
+## Use
+
+Once the program is built, it is invoked along with path of the config file:
+
+```bash
+./espop config.json
+```
+
+#### Warning
+
+If the **unsafeIndexDelete** configuration setting is set to true, existing indexes will be deleted without confirmation.
+
 ## Configuration
 
 There are two levels to configuring ESPOP: configuring the behavior of the program itself, and configuring the entities you will be writing into elasticsearch.  Additionally,
@@ -40,6 +52,8 @@ Here's an example configuration file:
     "queueSize" :10000,
     "workers": 16,
     "dateFormat": "2006-01-02T15:04:05-07:00",
+    "quietMode": false,
+    "unsafeIndexDelete": false,
     "entities": [ ... ]
 }
 ```
@@ -50,6 +64,8 @@ Here's an example configuration file:
 * **queueSize** - Each entity type has a work queue read by multiple workers - this defines how big it can get before blocking the producer
 * **workers** - Each entity type has 1 or more worker goroutines pulling items from the queue and writing them to elastic.  This defines how many per entity type.
 * **dateFormat** - The format that dates will be read (from entity config) and written (into templates).  The specific value of the date is [defined here](https://golang.org/pkg/time/#pkg-constants)
+* **quietMode** - If set to true, this will not cause every written entry to get logged to STDOUT.  This means the program can run for a long time without emitting messages.  On the other hand, if there are any exceptional circumstances they'll be much more obvious because only the success messages get supressed.
+* **unsafeIndexDelete** - By default, Espop will ask before deleting an index when it starts population.  Telling it no will skip that index.  Setting this flag will cause the indexes to be deleted without asking (BE CAREFUL)
 * **entities** - The array of individual entities which will be populated
 
 ### Entity config

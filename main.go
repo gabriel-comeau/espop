@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -19,6 +20,7 @@ var (
 	words            []string
 	config           Config
 	dateFormatString string
+	noConfirmDelMode bool
 )
 
 const (
@@ -80,10 +82,25 @@ func runEntityPopulation(entConf ConfEntity, wg *sync.WaitGroup) {
 	idGen := NewIdGen()
 	counter := NewCounter()
 
-	log.Printf("Deleting previously existing index %v\n", entConf.Index)
-	err := deleteIndex(entConf.Index)
-	if err != nil {
-		panic(err)
+	// Are we running in safemode?
+	doDelete := false
+	if config.UnsafeIndexDelete {
+		doDelete = true
+	} else {
+		if cliDeleteConfirm(entConf.Index) {
+			doDelete = true
+		}
+	}
+
+	if doDelete {
+		log.Printf("Deleting previously existing index %v\n", entConf.Index)
+		err := deleteIndex(entConf.Index)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		log.Printf("Delete not confirmed for index: %v - skipping\n", entConf.Index)
+		return
 	}
 
 	log.Printf("Starting %v workers for entity type %v\n", config.Workers, entConf.EsType)
@@ -120,7 +137,7 @@ func runWorker(queue chan Entry, stop chan bool, counter *Counter) {
 			err := writeEntry(entry)
 			if err != nil {
 				log.Printf("Entry type:%v id:%v got error: %v\n", entry.esType, entry.id, err.Error())
-			} else {
+			} else if !config.QuietMode {
 				log.Printf("Entry type:%v id:%v successfully posted\n", entry.esType, entry.id)
 			}
 			counter.Incr()
@@ -214,4 +231,24 @@ func initWordsDict() error {
 
 	words = strings.Split(string(rawData), "\n")
 	return nil
+}
+
+// ********************************
+//          HELPER FUNCS
+// ********************************
+
+// Confirm via command prompt before deleting an index
+func cliDeleteConfirm(idx string) bool {
+	fmt.Printf("Index %v is about to be deleted, please confirm by typing 'yes' > ", idx)
+	r := bufio.NewReader(os.Stdin)
+	input, err := r.ReadString('\n')
+	if err != nil {
+		log.Printf("Error trying to read user input from CLI: %v\n", err.Error())
+		return false
+	}
+
+	if strings.ToLower(strings.TrimSpace(input)) == "yes" {
+		return true
+	}
+	return false
 }
