@@ -76,7 +76,7 @@ func getStringVal(df DataField, esType string) string {
 // Generate an int val - random or defined.
 func getIntVal(df DataField, esType string) int {
 	if df.RandomValue {
-		return getRandomInt(df.MaxIntVal)
+		return getRandomInt(df.MinIntVal, df.MaxIntVal)
 	}
 	val := df.IntVal
 	if val == 0 {
@@ -88,7 +88,7 @@ func getIntVal(df DataField, esType string) int {
 // Generate a float val - either random or defined
 func getFloatVal(df DataField, esType string) float64 {
 	if df.RandomValue {
-		return getRandomFloat(df.MaxFloatVal)
+		return getRandomFloat(df.MinFloatVal, df.MaxFloatVal)
 	}
 	val := df.FloatVal
 	if val == 0 {
@@ -115,7 +115,7 @@ func getDateVal(df DataField, esType string) time.Time {
 		}
 
 		diffSeconds := maxDate.Unix() - minDate.Unix()
-		randSeconds := minDate.Unix() + int64(getRandomInt(int(diffSeconds)))
+		randSeconds := minDate.Unix() + int64(rand.Intn(int(diffSeconds)))
 
 		randDate := time.Unix(randSeconds, 0)
 		return randDate
@@ -152,11 +152,12 @@ func getRandomText(randWc bool, wc int, separator string) string {
 
 // Generate a random floating point number - note this isn't perfect and max not behave
 // quite as you desire because of integer truncating
-func getRandomFloat(max float64) float64 {
-	return float64(rand.Intn(int(max))) + rand.Float64()
+func getRandomFloat(min, max float64) float64 {
+	intPart := float64(rand.Intn(int(max)-int(min)+1)) + min
+	return intPart + rand.Float64()
 }
 
 // Generate a random integer between 0 and max
-func getRandomInt(max int) int {
-	return rand.Intn(max)
+func getRandomInt(min, max int) int {
+	return rand.Intn(max-min+1) + min
 }

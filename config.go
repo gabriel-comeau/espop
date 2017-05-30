@@ -38,9 +38,11 @@ type DataField struct {
 	Separator       string `json:"separator"`
 
 	// Random Int settings
+	MinIntVal int `json:"minIntVal"`
 	MaxIntVal int `json:"maxIntVal"`
 
 	// Random Float settings
+	MinFloatVal float64 `json:"minFloatVal"`
 	MaxFloatVal float64 `json:"maxFloatVal"`
 
 	// Random Date settings
