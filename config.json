@@ -1,0 +1,60 @@
+{
+    "esBaseUrl": "http://localhost:9200",
+    "dictFile": "/usr/share/dict/words",
+    "jsonTemplates": "templates",
+    "queueSize" :10000,
+    "workers": 8,
+    "dateFormat": "2006-01-02T15:04:05-07:00",
+    "entities": [
+        {
+            "index": "checkins",
+            "esType": "checkin",
+            "template": "example-checkins.json.tpl",
+            "numberEntities": 50000,
+            "dataFields": [
+                {
+                    "field": "location_name",
+                    "type": "string",
+                    "randomValue": true,
+                    "randomWordCount": true,
+                    "maxWordCount": 3,
+                    "separator": " "
+                },
+                {
+                    "field": "checkin_user_id",
+                    "type": "int",
+                    "randomValue": true,
+                    "minIntVal": 1,
+                    "maxIntVal": 10000
+                },
+                {
+                    "field": "longitude",
+                    "type": "float",
+                    "randomValue": true,
+                    "minFloatVal": -180,
+                    "maxFloatVal": 180
+                },
+                {
+                    "field": "latitude",
+                    "type": "float",
+                    "randomValue": true,
+                    "minFloatVal": -90,
+                    "maxFloatVal": 90
+                },
+                {
+                    "field": "checkin_date",
+                    "type": "date",
+                    "randomValue": true,
+                    "minDate": "2017-04-01T00:00:00-04:00",
+                    "maxDate": "2017-04-30T23:59:59-04:00"
+                },
+                {
+                    "field": "checkin_type",
+                    "type": "int",
+                    "randomValue": false,
+                    "intVal": 1
+                }
+            ]
+        }
+    ]
+}
