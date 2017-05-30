@@ -20,7 +20,6 @@ var (
 	words            []string
 	config           Config
 	dateFormatString string
-	noConfirmDelMode bool
 )
 
 const (
